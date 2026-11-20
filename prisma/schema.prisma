@@ -1,0 +1,249 @@
+// Chai & Chill Cafe — database schema (PostgreSQL)
+// All money is stored as integer paise (₹1 = 100 paise) to avoid rounding errors.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN // owner / manager: everything
+  STAFF // kitchen + floor: live orders, requests, settle bills
+}
+
+enum OrderStatus {
+  PLACED
+  PREPARING
+  READY
+  SERVED
+  CANCELLED
+}
+
+enum BillStatus {
+  OPEN
+  PAID
+  VOID
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+}
+
+enum RequestType {
+  WAITER
+  WATER
+  CLEAN
+  BILL
+  CUSTOM
+}
+
+enum RequestStatus {
+  OPEN
+  RESOLVED
+}
+
+enum GameKind {
+  TTT
+  RPS
+}
+
+enum GameStatus {
+  PENDING // challenge sent, waiting for the other table
+  ACTIVE
+  FINISHED
+  DECLINED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STAFF)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  settledBills     Bill[]
+  resolvedRequests ServiceRequest[]
+}
+
+/// Single-row table (id = 1) holding cafe-wide settings.
+model Settings {
+  id           Int     @id @default(1)
+  cafeName     String  @default("Chai & Chill Cafe")
+  tagline      String  @default("100% Pure Veg • Scan, Order & Play")
+  address      String  @default("")
+  phone        String  @default("")
+  gstin        String  @default("")
+  pureVeg      Boolean @default(true)
+  /// GST in basis points: 500 = 5.00%
+  gstRateBp    Int     @default(500)
+  wifiSsid     String  @default("")
+  wifiPassword String  @default("")
+  /// UPI VPA shown on the customer bill (e.g. chaichill@okaxis). Empty = hide UPI button.
+  upiId        String  @default("")
+  timezone     String  @default("Asia/Kolkata")
+  /// Customers can't place new orders while this is false (e.g. kitchen closed).
+  acceptingOrders Boolean @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  emoji     String     @default("🍽️")
+  sortOrder Int        @default(0)
+  active    Boolean    @default(true)
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  pricePaise  Int
+  emoji       String   @default("🍽️")
+  imageUrl    String?
+  isVeg       Boolean  @default(true)
+  /// e.g. ["Bestseller", "Spicy", "New"]
+  tags        String[] @default([])
+  /// false = "Sold out" today (kitchen can toggle)
+  available   Boolean  @default(true)
+  /// soft delete — keeps old orders intact
+  archived    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model CafeTable {
+  id         Int       @id @default(autoincrement())
+  number     Int       @unique
+  label      String?
+  seats      Int       @default(4)
+  /// secret code printed in the table QR: /t/{code}
+  code       String    @unique
+  active     Boolean   @default(true)
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  bills       Bill[]
+  orders      Order[]
+  requests    ServiceRequest[]
+  hostedGames GameMatch[]      @relation("hostGames")
+  guestGames  GameMatch[]      @relation("guestGames")
+}
+
+/// One running bill per seated party. Opens with the first order, closes when staff settles payment.
+model Bill {
+  id            String         @id @default(cuid())
+  billNo        Int            @unique @default(autoincrement())
+  tableId       Int
+  table         CafeTable      @relation(fields: [tableId], references: [id])
+  status        BillStatus     @default(OPEN)
+  subtotalPaise Int            @default(0)
+  taxPaise      Int            @default(0)
+  totalPaise    Int            @default(0)
+  paymentMethod PaymentMethod?
+  openedAt      DateTime       @default(now())
+  closedAt      DateTime?
+  settledById   String?
+  settledBy     User?          @relation(fields: [settledById], references: [id])
+  orders        Order[]
+
+  @@index([tableId, status])
+  @@index([closedAt])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNo       Int         @unique @default(autoincrement())
+  tableId       Int
+  table         CafeTable   @relation(fields: [tableId], references: [id])
+  billId        String
+  bill          Bill        @relation(fields: [billId], references: [id])
+  status        OrderStatus @default(PLACED)
+  customerName  String?
+  notes         String?
+  subtotalPaise Int
+  taxPaise      Int
+  totalPaise    Int
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  preparingAt   DateTime?
+  readyAt       DateTime?
+  servedAt      DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([tableId])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId     String
+  menuItem       MenuItem @relation(fields: [menuItemId], references: [id])
+  /// snapshot of name/price at order time, so menu edits never change history
+  name           String
+  unitPricePaise Int
+  qty            Int
+  lineTotalPaise Int
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model ServiceRequest {
+  id           String        @id @default(cuid())
+  tableId      Int
+  table        CafeTable     @relation(fields: [tableId], references: [id])
+  type         RequestType
+  message      String
+  status       RequestStatus @default(OPEN)
+  createdAt    DateTime      @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   User?         @relation(fields: [resolvedById], references: [id])
+
+  @@index([status])
+  @@index([tableId])
+}
+
+/// Cross-table multiplayer games (Tic-Tac-Toe, Stone-Paper-Scissors)
+model GameMatch {
+  id          String     @id @default(cuid())
+  kind        GameKind
+  status      GameStatus @default(PENDING)
+  hostTableId Int
+  hostTable   CafeTable  @relation("hostGames", fields: [hostTableId], references: [id])
+  guestTableId Int
+  guestTable  CafeTable  @relation("guestGames", fields: [guestTableId], references: [id])
+  /// game-specific JSON state (board, moves, scores)
+  state       Json
+  /// table id of the winner, null = draw / unfinished
+  winnerTableId Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([hostTableId, status])
+  @@index([guestTableId, status])
+}
