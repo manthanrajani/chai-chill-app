@@ -82,7 +82,7 @@ export function OrdersTab({
     if (!confirm(`Cancel order #${o.orderNo}?`)) return;
     setCancelling(o.id);
     try {
-      await api(`/api/t/${code}/orders/${o.id}/cancel`, "POST");
+      await api(`/api/table/${code}/orders/${o.id}/cancel`, "POST");
       toast(`Order #${o.orderNo} cancelled`, { tone: "info" });
     } catch (e) {
       toast("Couldn't cancel", { body: (e as Error).message, tone: "error" });
@@ -275,7 +275,7 @@ export function BillSheet({ open, onClose, code, data, onRefresh }: { open: bool
   async function request(message?: string) {
     setBusy(message ? "paid" : "bill");
     try {
-      await api(`/api/t/${code}/requests`, "POST", { type: "BILL", message });
+      await api(`/api/table/${code}/requests`, "POST", { type: "BILL", message });
       toast(message ? "Staff notified about your payment" : "Bill requested", { body: "Someone will be at your table shortly." });
       onRefresh();
     } catch (e) {

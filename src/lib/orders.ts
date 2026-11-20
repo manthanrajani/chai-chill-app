@@ -10,9 +10,15 @@ export const MAX_QTY_PER_ITEM = 20;
 export const MAX_LINES_PER_ORDER = 30;
 export const MAX_PENDING_ORDERS_PER_TABLE = 5;
 
-export async function getTableByCode(code: string) {
-  const table = await db.cafeTable.findUnique({ where: { code } });
-  if (!table || !table.active) throw new ApiError(404, "This table QR is not valid. Please ask the staff.");
+/**
+ * Finds a table from the URL: "/table/7" → table number 7.
+ * Old secret-code links ("/t/78b6mqdn33") are still accepted so printed/shared links keep working.
+ */
+export async function getTable(ref: string) {
+  const table = /^\d{1,4}$/.test(ref)
+    ? await db.cafeTable.findUnique({ where: { number: Number(ref) } })
+    : await db.cafeTable.findUnique({ where: { code: ref } });
+  if (!table || !table.active) throw new ApiError(404, "This table doesn't exist. Please choose your table again.");
   return table;
 }
 
@@ -30,7 +36,7 @@ export type PlaceOrderInput = {
 };
 
 export async function placeOrder(tableCode: string, input: PlaceOrderInput) {
-  const table = await getTableByCode(tableCode);
+  const table = await getTable(tableCode);
   const settings = await getSettings();
   if (!settings.acceptingOrders) {
     throw new ApiError(409, "Kitchen is not accepting orders right now. Please call the waiter.");
@@ -168,7 +174,7 @@ async function closeEmptyBill(tx: Prisma.TransactionClient, billId: string) {
 
 /** Customer may cancel only while the kitchen hasn't started. */
 export async function cancelOrderByCustomer(tableCode: string, orderId: string) {
-  const table = await getTableByCode(tableCode);
+  const table = await getTable(tableCode);
   const order = await db.order.findUnique({ where: { id: orderId } });
   if (!order || order.tableId !== table.id) throw new ApiError(404, "Order not found");
   if (order.status !== "PLACED") throw new ApiError(409, "The kitchen has already started this order. Please ask the waiter.");
@@ -212,7 +218,7 @@ const REQUEST_LABEL: Record<RequestType, string> = {
 };
 
 export async function createServiceRequest(tableCode: string, type: RequestType, message?: string) {
-  const table = await getTableByCode(tableCode);
+  const table = await getTable(tableCode);
   const text = type === "CUSTOM" ? (message ?? "").trim() : (message?.trim() || REQUEST_LABEL[type]);
   if (!text) throw new ApiError(400, "Please type your request");
   // don't spam the staff screen with the same request twice

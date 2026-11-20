@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { handle, json, readJson } from "@/lib/api";
-import { getTableByCode } from "@/lib/orders";
+import { getTable } from "@/lib/orders";
 import { challenge, getLobby, leave, move, rematch, respond, taunt, type RpsState } from "@/lib/games";
 
 type Lobby = Awaited<ReturnType<typeof getLobby>>;
@@ -19,9 +19,9 @@ function sanitize(lobby: Lobby) {
   return { ...lobby, current: { ...m, state: safe } };
 }
 
-export const GET = handle(async (_req: Request, ctx: RouteContext<"/api/t/[code]/games">) => {
-  const { code } = await ctx.params;
-  const table = await getTableByCode(code);
+export const GET = handle(async (_req: Request, ctx: RouteContext<"/api/table/[ref]/games">) => {
+  const { ref: code } = await ctx.params;
+  const table = await getTable(code);
   return json(sanitize(await getLobby(table.id)));
 });
 
@@ -34,9 +34,9 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("rematch"), matchId: z.string() }),
 ]);
 
-export const POST = handle(async (req: Request, ctx: RouteContext<"/api/t/[code]/games">) => {
-  const { code } = await ctx.params;
-  const table = await getTableByCode(code);
+export const POST = handle(async (req: Request, ctx: RouteContext<"/api/table/[ref]/games">) => {
+  const { ref: code } = await ctx.params;
+  const table = await getTable(code);
   const body = schema.parse(await readJson(req));
   switch (body.action) {
     case "challenge": await challenge(table.id, body.opponentTableId, body.kind); break;

@@ -7,7 +7,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="font-display text-2xl font-extrabold text-stone-900 sm:text-3xl">{title}</h1>
+        <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-stone-500">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -32,7 +32,7 @@ export function Card({ title, subtitle, actions, children, className }: { title?
   );
 }
 
-export const inputCls = "w-full rounded-xl border border-cream-300 bg-white px-3 py-2.5 text-sm text-stone-900 outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20";
+export const inputCls = "w-full rounded-xl border border-cream-300 bg-white px-3 py-2.5 text-sm text-stone-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20";
 
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: React.ReactNode; className?: string }) {
   return (
@@ -46,9 +46,9 @@ export function Field({ label, hint, children, className }: { label: string; hin
 
 export function Btn({ variant = "primary", className, ...p }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" | "dark" }) {
   const v = {
-    primary: "bg-amber-500 text-espresso-950 hover:bg-amber-400",
-    dark: "bg-espresso-900 text-amber-300 hover:bg-espresso-800",
-    ghost: "border border-cream-300 bg-white text-stone-700 hover:border-amber-500",
+    primary: "bg-brand-600 text-white hover:bg-brand-700",
+    dark: "bg-espresso-900 text-brand-300 hover:bg-espresso-800",
+    ghost: "border border-cream-300 bg-white text-stone-700 hover:border-brand-500",
     danger: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
   }[variant];
   return <button {...p} className={cn("inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-50", v, className)} />;
@@ -85,7 +85,7 @@ export function RangePicker({ range, from, to, onChange }: { range: RangeKey; fr
       <div className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-xl border border-cream-300 bg-white p-1">
         {RANGES.map((r) => (
           <button key={r.key} onClick={() => onChange({ range: r.key, from, to })}
-            className={cn("shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition", range === r.key ? "bg-espresso-900 text-amber-300" : "text-stone-600 hover:bg-cream-100")}>
+            className={cn("shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition", range === r.key ? "bg-espresso-900 text-brand-300" : "text-stone-600 hover:bg-cream-100")}>
             {r.label}
           </button>
         ))}

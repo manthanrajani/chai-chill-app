@@ -72,7 +72,7 @@ async function seedBase() {
     create: {
       id: 1,
       cafeName: "Chai & Chill Cafe",
-      tagline: "100% Pure Veg • Scan, Order & Play",
+      tagline: "100% Pure Veg • Order & Play",
       address: "Shop 4, Main Market Road",
       phone: "",
       wifiSsid: "ChaiAndChill_Free5G",
@@ -261,8 +261,8 @@ async function main() {
   await seedBase();
   if (args.has("--demo")) await seedDemo();
   const tables = await db.cafeTable.findMany({ orderBy: { number: "asc" }, select: { number: true, code: true } });
-  console.log("\nTable QR links (open on a phone, or print from Admin → Tables):");
-  for (const t of tables) console.log(`  Table ${String(t.number).padStart(2, "0")}: /t/${t.code}`);
+  console.log("\nTable links (open on a phone):");
+  for (const t of tables) console.log(`  Table ${String(t.number).padStart(2, "0")}: /table/${t.number}`);
 }
 
 main()

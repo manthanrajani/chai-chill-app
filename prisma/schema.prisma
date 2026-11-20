@@ -121,6 +121,8 @@ model MenuItem {
   /// soft delete — keeps old orders intact
   archived    Boolean  @default(false)
   sortOrder   Int      @default(0)
+  /// typical minutes to prepare (column added by migration 20261120104028; not used by the app yet)
+  prepMinutes Int      @default(10)
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]

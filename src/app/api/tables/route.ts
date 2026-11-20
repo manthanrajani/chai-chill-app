@@ -6,7 +6,7 @@ import { getSettings } from "@/lib/settings";
 export const GET = handle(async () => {
   const [settings, tables] = await Promise.all([
     getSettings(),
-    db.cafeTable.findMany({ where: { active: true }, orderBy: { number: "asc" }, select: { number: true, label: true, code: true } }),
+    db.cafeTable.findMany({ where: { active: true }, orderBy: { number: "asc" }, select: { number: true, label: true } }),
   ]);
   return json({
     cafe: { name: settings.cafeName, tagline: settings.tagline, pureVeg: settings.pureVeg, acceptingOrders: settings.acceptingOrders },

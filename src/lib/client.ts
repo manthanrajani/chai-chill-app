@@ -9,9 +9,17 @@ export class HttpError extends Error {
   }
 }
 
-async function parse(res: Response) {
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new HttpError(res.status, (data as { error?: string }).error ?? `Request failed (${res.status})`);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- each screen declares its own response type
+async function parse(res: Response): Promise<any> {
+  let data: unknown;
+  try {
+    data = await res.json();
+  } catch {
+    // body cut off (navigating away, flaky Wi-Fi) or not JSON — report it as a failure so SWR retries,
+    // never hand screens an empty object
+    throw new HttpError(res.ok ? 0 : res.status, res.ok ? "Connection interrupted — retrying…" : `Request failed (${res.status})`);
+  }
+  if (!res.ok) throw new HttpError(res.status, (data as { error?: string } | null)?.error ?? `Request failed (${res.status})`);
   return data;
 }
 

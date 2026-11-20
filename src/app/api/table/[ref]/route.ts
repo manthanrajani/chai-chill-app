@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { handle, json } from "@/lib/api";
-import { getTableByCode } from "@/lib/orders";
+import { getTable } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
 import { estimateOrders } from "@/lib/eta";
 
 /** Everything a customer phone needs about its table. Also acts as the "table is online" heartbeat. */
-export const GET = handle(async (_req: Request, ctx: RouteContext<"/api/t/[code]">) => {
-  const { code } = await ctx.params;
-  const table = await getTableByCode(code);
+export const GET = handle(async (_req: Request, ctx: RouteContext<"/api/table/[ref]">) => {
+  const { ref: code } = await ctx.params;
+  const table = await getTable(code);
 
   if (!table.lastSeenAt || Date.now() - table.lastSeenAt.getTime() > 20_000) {
     await db.cafeTable.update({ where: { id: table.id }, data: { lastSeenAt: new Date() } });

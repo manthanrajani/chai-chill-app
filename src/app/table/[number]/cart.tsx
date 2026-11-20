@@ -67,7 +67,7 @@ export function CartSheet(props: {
     if (sending) return;
     setSending(true);
     try {
-      const res = await api<{ order: { orderNo: number } }>(`/api/t/${code}/orders`, "POST", {
+      const res = await api<{ order: { orderNo: number } }>(`/api/table/${code}/orders`, "POST", {
         items: lines.map((l) => ({ menuItemId: l.item.id, qty: l.qty })),
         notes: notes.trim() || undefined,
         customerName: name.trim() || undefined,

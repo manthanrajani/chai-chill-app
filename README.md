@@ -1,6 +1,6 @@
 # Chai & Chill Cafe — Smart Table App
 
-Customers scan the QR code on their table to see the menu, order straight to the kitchen, call a waiter, get the Wi-Fi password, pay by UPI and play games while they wait. The kitchen gets a live order screen, and the owner gets a sales dashboard.
+Customers open the cafe's website, tap their table number and see the menu, order straight to the kitchen, call a waiter, get the Wi-Fi password, pay by UPI and play games while they wait. The kitchen gets a live order screen, and the owner gets a sales dashboard.
 
 **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · PostgreSQL · Prisma 7 · SWR · Recharts
 
@@ -10,7 +10,7 @@ Customers scan the QR code on their table to see the menu, order straight to the
 
 | Who | URL | What they do |
 |---|---|---|
-| **Customer** (phone) | `/t/<table-code>` (opens straight from the table QR) | Three tabs: **Menu** (search, categories, cart, cooking notes) · **Orders** (waiting / cooking / ready / served counts, estimated ready time with countdown, orders ahead in the queue, a timeline with times for each step, how long each served order took) · **Play** (games). Also call waiter / water / clean / bill, Wi-Fi password, running bill with CGST/SGST and **Pay via UPI**. The phone vibrates and chimes when food is ready. |
+| **Customer** (phone) | `/` (welcome + your table) · `/tables` (choose table) · `/table/7` (menu) · `/table/7/orders` · `/table/7/play` · `/table/7/waiter` · `/table/7/bill` · `/table/7/wifi` — the address bar follows the screen, so refresh/share keeps you in place. Old `/t/<code>` links redirect automatically; bad addresses return 404 and `/table/07` → `/table/7`. |  Three tabs: **Menu** (search, categories, cart, cooking notes) · **Orders** (waiting / cooking / ready / served counts, estimated ready time with countdown, orders ahead in the queue, a timeline with times for each step, how long each served order took) · **Play** (games). Also call waiter / water / clean / bill, Wi-Fi password, running bill with CGST/SGST and **Pay via UPI**. The phone vibrates and chimes when food is ready. |
 | **Kitchen & floor staff** (tablet) | `/kitchen` | New → Preparing → Ready → Served board with timers, sound bell for new orders, table requests, floor map, **close bills (Cash / UPI / Card)**, print bill, mark dishes **sold out**, pause online ordering |
 | **Staff entrance** | `/staff` | Private link for the team (bookmark it on the kitchen tablet and the owner's phone). Sends people to login, then to the kitchen screen or owner dashboard by role. Customers never see staff links. |
 | **Owner** | `/admin` | **Table bell alerts on every admin page:** when a table taps Call waiter / Water / Clean / Bill, a ringing card shows *which table* and what they need, and keeps ringing every 20 s until someone taps **Done**. Also: new-order pop-ups, a flashing browser-tab title, and desktop notifications when the tab is in the background (tap "Turn on table bell" once per device). Sales for **today / this month / this year** compared with the same time in the previous period, plus a report for any date range: sales trend, best-sellers, busiest hours, categories, payment split, table performance, kitchen speed, **CSV export** |
@@ -106,7 +106,8 @@ src/proxy.ts                login protection for /kitchen and /admin
 src/lib/orders.ts           ordering, bills, status changes, waiter requests
 src/lib/analytics.ts        today / month / year and range reports
 src/lib/games.ts            multiplayer games between tables
-src/app/t/[code]/           customer app
+src/app/table/[number]/      customer app (/table/7/…)
+src/app/table-picker.tsx     welcome page + table chooser (/ and /tables)
 src/app/kitchen/            kitchen & floor screen
 src/app/admin/              owner dashboard & management
 src/app/api/                JSON API (public /t/*, staff /staff/*, admin /admin/*)

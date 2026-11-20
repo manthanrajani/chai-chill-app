@@ -43,7 +43,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const KIND_LABEL = { TTT: "Tic-Tac-Toe", RPS: "Stone-Paper-Scissors" };
 
 function useLobby(code: string, fast: boolean) {
-  return useSWR<Lobby>(`/api/t/${code}/games`, fetcher, { refreshInterval: fast ? 1500 : 5000 });
+  return useSWR<Lobby>(`/api/table/${code}/games`, fetcher, { refreshInterval: fast ? 1500 : 5000 });
 }
 
 /** Shows a popup when another table challenges this one (while the customer is on the menu tab). */
@@ -127,7 +127,7 @@ function OnlineArena({ code, tableId, tableNumber, lobby, mutate }: { code: stri
   async function act(body: Record<string, unknown>) {
     setBusy(true);
     try {
-      const data = await api<Lobby>(`/api/t/${code}/games`, "POST", body);
+      const data = await api<Lobby>(`/api/table/${code}/games`, "POST", body);
       mutate(data);
     } catch (e) {
       toast((e as Error).message, { tone: "warning" });

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import QRCode from "qrcode";
-import { ExternalLink, Plus, Printer, RefreshCw, TriangleAlert } from "lucide-react";
+import { ExternalLink, Plus, Printer, TriangleAlert } from "lucide-react";
 import { api, cn, fetcher } from "@/lib/client";
 import { isLocalUrl, useBaseUrl } from "@/lib/use-base-url";
 import { Btn, Card, Field, PageHeader, Toggle, inputCls } from "@/components/admin-ui";
@@ -44,7 +44,7 @@ export default function TablesAdmin() {
       <Card title="Website address in the QR codes" className="mb-4">
         <BaseUrlEditor key={base} initial={base} onSave={(v) => { setBase(v); toast("QR address saved"); }} />
         <p className="mt-2 text-xs text-stone-500">
-          QR codes open: <a href={`${base}/t/…`} className="font-mono font-semibold text-stone-800">{base}/t/…</a>
+          Table links look like: <a href={`${base}/table/1`} className="font-mono font-semibold text-stone-800">{base}/table/1</a>
           {!saved && " (set automatically)"}
         </p>
         {lanUrls.length > 0 && (
@@ -78,7 +78,7 @@ export default function TablesAdmin() {
 }
 
 function TableCard({ t, base, run }: { t: Table; base: string; run: (fn: () => Promise<unknown>, ok: string) => void }) {
-  const url = `${base}/t/${t.code}`;
+  const url = `${base}/table/${t.number}`;
   const [qr, setQr] = useState("");
   const [label, setLabel] = useState(t.label ?? "");
   const [seats, setSeats] = useState(String(t.seats));
@@ -98,17 +98,11 @@ function TableCard({ t, base, run }: { t: Table; base: string; run: (fn: () => P
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {qr && <img src={qr} alt={`QR code for table ${t.number}`} className="mx-auto my-3 size-36 rounded-lg bg-white p-1" />}
-      <a href={`/t/${t.code}`} target="_blank" className="flex items-center justify-center gap-1 truncate text-xs font-semibold text-brand-700 hover:underline"><ExternalLink className="size-3" /> Open as customer</a>
+      <a href={`/table/${t.number}`} target="_blank" className="flex items-center justify-center gap-1 truncate text-xs font-semibold text-brand-700 hover:underline"><ExternalLink className="size-3" /> Open as customer</a>
       <div className="mt-3 grid grid-cols-[1fr_4.5rem] gap-2">
         <Field label="Label"><input value={label} onChange={(e) => setLabel(e.target.value)} onBlur={() => label !== (t.label ?? "") && run(() => api(`/api/admin/tables/${t.id}`, "PATCH", { label }), "Saved")} placeholder="e.g. Window" className={cn(inputCls, "py-1.5")} /></Field>
         <Field label="Seats"><input type="number" min={1} max={30} value={seats} onChange={(e) => setSeats(e.target.value)} onBlur={() => Number(seats) !== t.seats && run(() => api(`/api/admin/tables/${t.id}`, "PATCH", { seats: Number(seats) }), "Saved")} className={cn(inputCls, "py-1.5")} /></Field>
       </div>
-      <button
-        onClick={() => confirm(`Make a new QR for Table ${t.number}? The old printed QR will stop working.`) && run(() => api(`/api/admin/tables/${t.id}`, "PATCH", { regenerateCode: true }), "New QR code created — reprint this table's card")}
-        className="mt-3 flex w-full items-center justify-center gap-1 text-xs font-semibold text-stone-500 hover:text-rose-600"
-      >
-        <RefreshCw className="size-3" /> Replace QR code
-      </button>
     </div>
   );
 }

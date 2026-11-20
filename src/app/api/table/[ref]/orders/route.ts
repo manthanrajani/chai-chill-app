@@ -8,8 +8,8 @@ const schema = z.object({
   customerName: z.string().max(40).optional(),
 });
 
-export const POST = handle(async (req: Request, ctx: RouteContext<"/api/t/[code]/orders">) => {
-  const { code } = await ctx.params;
+export const POST = handle(async (req: Request, ctx: RouteContext<"/api/table/[ref]/orders">) => {
+  const { ref: code } = await ctx.params;
   const body = schema.parse(await readJson(req));
   const order = await placeOrder(code, body);
   return json({ order }, { status: 201 });

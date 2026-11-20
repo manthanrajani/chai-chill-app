@@ -103,11 +103,11 @@ export function LiveAlerts() {
     <div className="no-print pointer-events-none fixed inset-x-3 bottom-3 z-[90] flex flex-col items-end gap-2 sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[380px]">
       {/* new orders (auto-hide) */}
       {newOrders.map((o) => (
-        <div key={o.id} className="pointer-events-auto w-full rounded-2xl border border-amber-400/60 bg-espresso-900 p-3 text-stone-100 shadow-2xl animate-slide-up">
+        <div key={o.id} className="pointer-events-auto w-full rounded-2xl border border-brand-400/60 bg-espresso-900 p-3 text-stone-100 shadow-2xl animate-slide-up">
           <div className="flex items-start gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-500 text-espresso-950"><ChefHat className="size-5" /></span>
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-500 text-espresso-950"><ChefHat className="size-5" /></span>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-extrabold text-amber-300">New order #{o.orderNo} · Table {pad(o.table.number)}</div>
+              <div className="text-sm font-extrabold text-brand-300">New order #{o.orderNo} · Table {pad(o.table.number)}</div>
               <div className="truncate text-xs text-stone-300">{o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}</div>
               <div className="mt-0.5 text-xs font-bold text-stone-200">{formatINR(o.totalPaise)}</div>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { Armchair, BellRing, Gamepad2, Leaf, Loader2, ReceiptText, RefreshCw } from "lucide-react";
 import { cn, fetcher } from "@/lib/client";
@@ -9,9 +9,9 @@ import { usePersistentState } from "@/lib/use-persistent";
 
 type Data = {
   cafe: { name: string; tagline: string; pureVeg: boolean; acceptingOrders: boolean };
-  tables: { number: number; label: string | null; code: string }[];
+  tables: { number: number; label: string | null }[];
 };
-type Last = { code: string; number: number; at: number } | null;
+type Last = { number: number; at: number } | null;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const REMEMBER_MS = 12 * 60 * 60 * 1000; // a chosen table is remembered for 12 hours
@@ -35,25 +35,25 @@ function getNow() {
  * Home screen.
  * Step 1 — "Which table are you at?" (table number grid).
  * Step 2 — cafe home for that table: Order & pay · Call waiter · Play games.
+ * `/` shows step 2 for a remembered table; `/tables` (forcePick) always shows step 1.
  */
-export function TablePicker() {
+export function TablePicker({ forcePick = false }: { forcePick?: boolean }) {
   const router = useRouter();
-  const params = useSearchParams();
   const { data, error } = useSWR<Data>("/api/tables", fetcher);
   const [last, setLast] = usePersistentState<Last>("cc:last-table", null);
   const now = useSyncExternalStore(subscribeNow, getNow, () => 0);
-  const forceChange = params.get("change") === "1"; // from the "change" link on a table page
+  const forceChange = forcePick;
   const [changing, setChanging] = useState(false);
   const [going, setGoing] = useState<string | null>(null);
   const [typed, setTyped] = useState("");
   const [typedError, setTypedError] = useState("");
 
-  if (error) {
+  if (error && !data) {
     return <Center><p className="text-sm text-ink-2">Can&apos;t connect right now. Please check your internet and try again.</p></Center>;
   }
   if (!data) return <Center><Loader2 className="size-7 animate-spin text-brand-600" /></Center>;
 
-  const current = last && now - last.at < REMEMBER_MS ? data.tables.find((t) => t.code === last.code) ?? null : null;
+  const current = last && now - last.at < REMEMBER_MS ? data.tables.find((t) => t.number === last.number) ?? null : null;
   const showHub = !!current && !changing && !forceChange;
   const backToHub = () => {
     setChanging(false);
@@ -67,15 +67,15 @@ export function TablePicker() {
       return;
     }
     setTypedError("");
-    setLast({ code: t.code, number: t.number, at: timestamp() });
+    setLast({ number: t.number, at: timestamp() });
     backToHub();
   }
 
   function go(where: "menu" | "waiter" | "games") {
     if (!current) return;
     setGoing(where);
-    const q = where === "waiter" ? "?open=waiter" : where === "games" ? "?tab=games" : "";
-    router.push(`/t/${current.code}${q}`);
+    const section = where === "waiter" ? "/waiter" : where === "games" ? "/play" : "";
+    router.push(`/table/${current.number}${section}`);
     // reset once we're away, in case the guest comes back with the browser's back button
     setTimeout(() => setGoing(null), 4000);
   }
@@ -108,7 +108,7 @@ export function TablePicker() {
                 <div className="font-serif text-xl font-semibold text-ink">Table {pad(current!.number)}</div>
               </div>
             </div>
-            <button onClick={() => setChanging(true)} className="press flex items-center gap-1 rounded-full bg-sand px-3 py-1.5 text-xs font-semibold text-ink-2 hover:bg-sand-2 hover:text-ink">
+            <button onClick={() => router.push("/tables")} className="press flex items-center gap-1 rounded-full bg-sand px-3 py-1.5 text-xs font-semibold text-ink-2 hover:bg-sand-2 hover:text-ink">
               <RefreshCw className="size-3" /> Change table
             </button>
           </div>

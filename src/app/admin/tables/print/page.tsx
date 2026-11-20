@@ -25,7 +25,7 @@ export default function PrintQr() {
 
   useEffect(() => {
     if (!base || !tables.data) return;
-    Promise.all(tables.data.tables.filter((t) => t.active).map(async (t) => [t.id, await QRCode.toDataURL(`${base}/t/${t.code}`, { margin: 1, width: 400 })] as const))
+    Promise.all(tables.data.tables.filter((t) => t.active).map(async (t) => [t.id, await QRCode.toDataURL(`${base}/table/${t.number}`, { margin: 1, width: 400 })] as const))
       .then((pairs) => setCodes(Object.fromEntries(pairs)));
   }, [base, tables.data]);
   useEffect(() => {

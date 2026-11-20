@@ -23,7 +23,7 @@ export function WaiterSheet({ open, onClose, code, tableNo, requests, onSent }: 
   async function send(type: RequestType, message?: string) {
     setBusy(type);
     try {
-      const res = await api<{ duplicate: boolean }>(`/api/t/${code}/requests`, "POST", { type, message });
+      const res = await api<{ duplicate: boolean }>(`/api/table/${code}/requests`, "POST", { type, message });
       chime("alert");
       toast(res.duplicate ? "Already on it!" : "Staff notified", { body: res.duplicate ? "Your request is already on the staff screen." : "Someone will come to your table shortly." });
       if (type === "CUSTOM") setCustom("");

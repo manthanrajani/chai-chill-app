@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { BellRing, BookOpen, ChevronDown, ChevronRight, Gamepad2, Leaf, ReceiptText, Wifi, CircleCheck, PauseCircle, ClipboardList } from "lucide-react";
 import { fetcher, HttpError, cn } from "@/lib/client";
@@ -17,29 +16,38 @@ import { WaiterSheet, WifiSheet } from "./service";
 import { GamesZone, IncomingWatcher } from "./games/zone";
 import { usePersistentState } from "@/lib/use-persistent";
 
-export function TableApp({ code }: { code: string }) {
+export type Section = "menu" | "orders" | "play" | "waiter" | "bill" | "wifi";
+type Tab = "menu" | "orders" | "games";
+type SheetName = null | "cart" | "bill" | "waiter" | "wifi";
+
+/** Readable address for the current screen: /table/7, /table/7/orders, /table/7/play, /table/7/waiter … */
+function pathFor(code: string, tab: Tab, sheet: SheetName) {
+  if (sheet === "waiter" || sheet === "bill" || sheet === "wifi") return `/table/${code}/${sheet}`;
+  if (tab === "orders") return `/table/${code}/orders`;
+  if (tab === "games") return `/table/${code}/play`;
+  return `/table/${code}`;
+}
+
+export function TableApp({ code, section = "menu" }: { code: string; section?: Section }) {
   const toast = useToast();
-  const table = useSWR<TableResponse>(`/api/t/${code}`, fetcher, { refreshInterval: 4000, revalidateOnFocus: true });
+  const table = useSWR<TableResponse>(`/api/table/${code}`, fetcher, { refreshInterval: 4000, revalidateOnFocus: true });
   const menu = useSWR<MenuResponse>("/api/menu", fetcher, { refreshInterval: 60_000 });
 
-  // deep links: /t/<code>?tab=orders|games  and  ?open=waiter|wifi|bill
-  const params = useSearchParams();
-  const [tab, setTab] = useState<"menu" | "orders" | "games">(() => {
-    const t = params.get("tab");
-    return t === "orders" || t === "games" ? t : "menu";
-  });
-  const [sheet, setSheet] = useState<null | "cart" | "bill" | "waiter" | "wifi">(() => {
-    const o = params.get("open");
-    return o === "waiter" || o === "wifi" || o === "bill" ? o : null;
-  });
+  // the screen comes from the URL (/table/7/orders …) and the URL follows the screen
+  const [tab, setTab] = useState<Tab>(section === "orders" ? "orders" : section === "play" ? "games" : "menu");
+  const [sheet, setSheet] = useState<SheetName>(section === "waiter" || section === "bill" || section === "wifi" ? section : null);
   const closeSheet = useCallback(() => setSheet(null), []);
+  useEffect(() => {
+    const path = pathFor(code, tab, sheet);
+    if (window.location.pathname !== path) window.history.replaceState(window.history.state, "", path);
+  }, [code, tab, sheet]);
 
   // cart survives refreshes (per table)
   const [savedCart, setCart] = usePersistentState<Cart>(`cc:cart:${code}`, {});
 
   const itemsById = useMemo(() => {
     const m = new Map<string, MenuResponse["categories"][number]["items"][number]>();
-    menu.data?.categories.forEach((c) => c.items.forEach((i) => m.set(i.id, i)));
+    menu.data?.categories?.forEach((c) => c.items?.forEach((i) => m.set(i.id, i)));
     return m;
   }, [menu.data]);
 
@@ -60,7 +68,7 @@ export function TableApp({ code }: { code: string }) {
     });
   }, [setCart]);
 
-  const gstRateBp = table.data?.cafe.gstRateBp ?? menu.data?.cafe.gstRateBp ?? 500;
+  const gstRateBp = table.data?.cafe?.gstRateBp ?? menu.data?.cafe?.gstRateBp ?? 500;
   const cartSummary = useMemo(() => {
     let count = 0;
     let subtotal = 0;
@@ -99,7 +107,7 @@ export function TableApp({ code }: { code: string }) {
   const tableNumber = table.data?.table.number;
   useEffect(() => {
     if (!tableNumber) return;
-    try { localStorage.setItem("cc:last-table", JSON.stringify({ code, number: tableNumber, at: Date.now() })); } catch {}
+    try { localStorage.setItem("cc:last-table", JSON.stringify({ number: tableNumber, at: Date.now() })); } catch {}
   }, [code, tableNumber]);
 
   // browser tab shows the cafe's own name
@@ -114,7 +122,7 @@ export function TableApp({ code }: { code: string }) {
   const thanks = !!closed && !table.data?.bill && dismissedBill !== closed.id;
   const dismissThanks = () => closed && setDismissedBill(closed.id);
 
-  if (table.error) {
+  if (table.error && !table.data?.cafe) {
     const notFound = table.error instanceof HttpError && table.error.status === 404;
     return (
       <div className="mx-auto grid min-h-dvh max-w-md place-items-center px-6 text-center">
@@ -124,12 +132,12 @@ export function TableApp({ code }: { code: string }) {
           <p className="mt-2 text-sm text-ink-2">
             {notFound ? "Please choose your table again, or ask the staff for help." : "Check your internet / Wi-Fi — we'll keep retrying automatically."}
           </p>
-          {notFound && <Link href="/?change=1" className="press mt-6 inline-block rounded-2xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-brand">Choose my table</Link>}
+          {notFound && <Link href="/tables" className="press mt-6 inline-block rounded-2xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-brand">Choose my table</Link>}
         </div>
       </div>
     );
   }
-  if (!table.data || !menu.data) return <LoadingShell />;
+  if (!table.data?.cafe || !menu.data?.categories) return <LoadingShell />;
 
   const { cafe, bill, requests } = table.data;
   const tableNo = String(table.data.table.number).padStart(2, "0");
@@ -155,7 +163,7 @@ export function TableApp({ code }: { code: string }) {
               )}
             </div>
           </div>
-          <Link href="/?change=1" title="Change table" className="press flex shrink-0 items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 shadow-card">
+          <Link href="/tables" title="Change table" className="press flex shrink-0 items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 shadow-card">
             <span className="grid size-7 place-items-center rounded-full bg-brand-600 text-xs font-extrabold text-white">{tableNo}</span>
             <span className="text-xs font-bold text-ink">Table</span>
             <ChevronDown className="size-3.5 text-ink-3" />
