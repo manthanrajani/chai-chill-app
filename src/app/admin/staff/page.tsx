@@ -62,7 +62,7 @@ export default function StaffAdmin() {
 function AddUser({ onClose, onSave }: { onClose: () => void; onSave: (d: object) => void }) {
   const [f, setF] = useState({ name: "", email: "", password: "", role: "STAFF" });
   return (
-    <Sheet open onClose={onClose} light title="Add staff login">
+    <Sheet open onClose={onClose} title="Add staff login">
       <form className="grid gap-3" onSubmit={(e) => { e.preventDefault(); onSave(f); }}>
         <Field label="Name"><input required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} className={inputCls} /></Field>
         <Field label="Email (used to sign in)"><input required type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} className={inputCls} /></Field>
@@ -82,7 +82,7 @@ function AddUser({ onClose, onSave }: { onClose: () => void; onSave: (d: object)
 function ResetPassword({ user, onClose, onSave }: { user: User; onClose: () => void; onSave: (p: string) => void }) {
   const [p, setP] = useState("");
   return (
-    <Sheet open onClose={onClose} light title={`New password for ${user.name}`}>
+    <Sheet open onClose={onClose} title={`New password for ${user.name}`}>
       <form className="grid gap-3" onSubmit={(e) => { e.preventDefault(); onSave(p); }}>
         <Field label="New password" hint="At least 8 characters"><input required minLength={8} type="text" value={p} onChange={(e) => setP(e.target.value)} className={inputCls} /></Field>
         <Btn type="submit">Save password</Btn>

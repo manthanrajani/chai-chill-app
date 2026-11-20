@@ -103,7 +103,7 @@ export function KitchenApp() {
     act(() => api(`/api/staff/orders/${o.id}`, "PATCH", { status, reason }), status === "CANCELLED" ? `Order #${o.orderNo} cancelled` : undefined);
 
   if (!data) {
-    return <div className="grid flex-1 place-items-center text-stone-400">{live.error ? (live.error as Error).message : <Loader2 className="size-6 animate-spin" />}</div>;
+    return <div className="grid min-h-dvh flex-1 place-items-center bg-espresso-950 text-stone-400">{live.error ? (live.error as Error).message : <Loader2 className="size-6 animate-spin" />}</div>;
   }
 
   const occupied = data.floor.filter((t) => t.status !== "vacant" && t.status !== "online").length;
@@ -111,12 +111,12 @@ export function KitchenApp() {
 
   return (
     <>
-    <div className="no-print flex flex-1 flex-col">
+    <div className="no-print flex min-h-dvh flex-1 flex-col bg-espresso-950 text-stone-100 selection:bg-brand-500 selection:text-white">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-amber-500/20 bg-espresso-950/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-brand-500/20 bg-espresso-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-3 py-2.5 sm:px-5">
           <div className="flex items-center gap-2.5">
-            <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-lg">☕</div>
+            <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-brand-400 to-brand-600 text-lg">☕</div>
             <div>
               <div className="font-display text-sm font-extrabold leading-tight text-white sm:text-base">{data.cafeName}</div>
               <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
@@ -134,7 +134,7 @@ export function KitchenApp() {
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => act(() => api("/api/staff/settings", "PATCH", { acceptingOrders: !data.acceptingOrders }), data.acceptingOrders ? "Online ordering paused" : "Online ordering resumed")}
-              className={cn("flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold", data.acceptingOrders ? "border-emerald-500/40 text-emerald-300" : "border-amber-500 bg-amber-500/15 text-amber-300")}
+              className={cn("flex items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold", data.acceptingOrders ? "border-emerald-500/40 text-emerald-300" : "border-brand-500 bg-brand-500/15 text-brand-300")}
               title="Pause or resume QR ordering"
             >
               {data.acceptingOrders ? <PlayCircle className="size-4" /> : <PauseCircle className="size-4" />}
@@ -147,7 +147,7 @@ export function KitchenApp() {
                 setSoundPref(next);
                 if (next) chime("order");
               }}
-              className={cn("rounded-lg border px-2.5 py-2", sound ? "border-amber-500/50 text-amber-300" : "border-rose-500/50 bg-rose-500/10 text-rose-300")}
+              className={cn("rounded-lg border px-2.5 py-2", sound ? "border-brand-500/50 text-brand-300" : "border-rose-500/50 bg-rose-500/10 text-rose-300")}
               title={sound ? "Sound on" : "Sound off — tap to enable alerts"}
             >
               {sound ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
@@ -172,7 +172,7 @@ export function KitchenApp() {
       <main className="mx-auto w-full max-w-[1600px] flex-1 space-y-5 p-3 sm:p-5">
         {/* stats */}
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-5">
-          <Stat label="New orders" value={byStatus.PLACED.length} tone="text-amber-400" />
+          <Stat label="New orders" value={byStatus.PLACED.length} tone="text-brand-400" />
           <Stat label="Preparing" value={byStatus.PREPARING.length} tone="text-sky-400" />
           <Stat label="Ready to serve" value={byStatus.READY.length} tone="text-emerald-400" />
           <Stat label="Table requests" value={data.requests.length} tone="text-rose-400" />
@@ -198,7 +198,7 @@ export function KitchenApp() {
                       </div>
                       <div className="flex shrink-0 flex-col gap-1.5">
                         {r.type === "BILL" && (
-                          <button onClick={() => { setBillTable(r.tableId); }} className="rounded-lg bg-amber-500 px-2.5 py-1.5 text-xs font-extrabold text-espresso-950">Open bill</button>
+                          <button onClick={() => { setBillTable(r.tableId); }} className="rounded-lg bg-brand-500 px-2.5 py-1.5 text-xs font-extrabold text-espresso-950">Open bill</button>
                         )}
                         <button onClick={() => act(() => api(`/api/staff/requests/${r.id}`, "PATCH"))} className="flex items-center gap-1 rounded-lg bg-emerald-500 px-2.5 py-1.5 text-xs font-extrabold text-espresso-950">
                           <Check className="size-3.5" /> Done
@@ -211,12 +211,12 @@ export function KitchenApp() {
             )}
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <Column title="New" icon={<ReceiptText className="size-4" />} tone="border-amber-500/60" count={byStatus.PLACED.length} empty="No new orders">
+              <Column title="New" icon={<ReceiptText className="size-4" />} tone="border-brand-500/60" count={byStatus.PLACED.length} empty="No new orders">
                 {byStatus.PLACED.map((o) => (
-                  <Ticket key={o.id} o={o} now={now} accent="border-amber-500" actions={
+                  <Ticket key={o.id} o={o} now={now} accent="border-brand-500" actions={
                     <>
                       <button onClick={() => { const r = prompt(`Cancel order #${o.orderNo}? Reason (shown in reports):`, "Item unavailable"); if (r !== null) setOrder(o, "CANCELLED", r); }} className="rounded-xl border border-stone-700 px-3 py-2.5 text-xs font-bold text-stone-300" title="Cancel order"><Ban className="size-4" /></button>
-                      <button onClick={() => setOrder(o, "PREPARING")} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-amber-500 py-2.5 text-sm font-extrabold text-espresso-950 hover:bg-amber-400"><CookingPot className="size-4" /> Accept & cook</button>
+                      <button onClick={() => setOrder(o, "PREPARING")} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-500 py-2.5 text-sm font-extrabold text-espresso-950 hover:bg-brand-400"><CookingPot className="size-4" /> Accept & cook</button>
                     </>
                   } />
                 ))}
@@ -263,9 +263,9 @@ export function KitchenApp() {
 
 function TopTab({ active, onClick, icon, label, count }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; count?: number }) {
   return (
-    <button onClick={onClick} className={cn("flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition sm:flex-none sm:text-sm", active ? "bg-amber-500 text-espresso-950" : "text-stone-300 hover:text-white")}>
+    <button onClick={onClick} className={cn("flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition sm:flex-none sm:text-sm", active ? "bg-brand-500 text-espresso-950" : "text-stone-300 hover:text-white")}>
       {icon} {label}
-      {!!count && <span className={cn("rounded-full px-1.5 text-[10px] font-black", active ? "bg-espresso-950 text-amber-400" : "bg-rose-600 text-white")}>{count}</span>}
+      {!!count && <span className={cn("rounded-full px-1.5 text-[10px] font-black", active ? "bg-espresso-950 text-brand-400" : "bg-rose-600 text-white")}>{count}</span>}
     </button>
   );
 }
@@ -292,12 +292,12 @@ function Column({ title, icon, tone, count, empty, children }: { title: string; 
 
 function Ticket({ o, now, accent, actions }: { o: LiveOrder; now: number; accent: string; actions: React.ReactNode }) {
   const mins = minutesSince(o.createdAt, now);
-  const late = mins >= 20 ? "bg-rose-500 text-white" : mins >= 10 ? "bg-amber-500/20 text-amber-300" : "bg-espresso-800 text-stone-300";
+  const late = mins >= 20 ? "bg-rose-500 text-white" : mins >= 10 ? "bg-brand-500/20 text-brand-300" : "bg-espresso-800 text-stone-300";
   return (
     <article className={cn("rounded-2xl border-2 bg-espresso-900 p-3.5 shadow-lg animate-pop", accent)}>
       <div className="flex items-center justify-between gap-2 border-b border-stone-800 pb-2.5">
         <div className="flex items-center gap-2">
-          <span className="rounded-lg bg-amber-500/20 px-2.5 py-1 font-display text-base font-black text-amber-300">T{pad(o.table.number)}</span>
+          <span className="rounded-lg bg-brand-500/20 px-2.5 py-1 font-display text-base font-black text-brand-300">T{pad(o.table.number)}</span>
           <span className="text-xs font-bold text-stone-400">#{o.orderNo}</span>
           {o.customerName && <span className="truncate text-xs text-stone-400">· {o.customerName}</span>}
         </div>
@@ -309,13 +309,13 @@ function Ticket({ o, now, accent, actions }: { o: LiveOrder; now: number; accent
         {o.items.map((i) => (
           <li key={i.id} className="flex items-start justify-between gap-2 text-[15px] font-semibold text-white">
             <span>{i.name}</span>
-            <span className="shrink-0 rounded bg-espresso-950 px-2 py-0.5 text-sm font-black text-amber-400">×{i.qty}</span>
+            <span className="shrink-0 rounded bg-espresso-950 px-2 py-0.5 text-sm font-black text-brand-400">×{i.qty}</span>
           </li>
         ))}
       </ul>
       {o.notes && (
-        <div className="mb-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-100">
-          <b className="text-amber-400">Note:</b> {o.notes}
+        <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/10 p-2.5 text-xs text-brand-100">
+          <b className="text-brand-400">Note:</b> {o.notes}
         </div>
       )}
       <div className="flex gap-2">{actions}</div>
@@ -326,8 +326,8 @@ function Ticket({ o, now, accent, actions }: { o: LiveOrder; now: number; accent
 const FLOOR_STYLE: Record<FloorTable["status"], { box: string; label: string }> = {
   vacant: { box: "border-stone-800 bg-espresso-950 text-stone-400", label: "Vacant" },
   online: { box: "border-indigo-500/50 bg-indigo-500/10 text-indigo-300", label: "Browsing menu" },
-  seated: { box: "border-amber-500/40 bg-amber-500/5 text-amber-200", label: "Dining" },
-  food: { box: "border-amber-500/70 bg-amber-500/15 text-amber-300", label: "Order in kitchen" },
+  seated: { box: "border-brand-500/40 bg-brand-500/5 text-brand-200", label: "Dining" },
+  food: { box: "border-brand-500/70 bg-brand-500/15 text-brand-300", label: "Order in kitchen" },
   attention: { box: "border-rose-500 bg-rose-500/15 text-rose-300 animate-pulse-ring", label: "Needs staff" },
 };
 
@@ -339,7 +339,7 @@ function FloorMap({ floor, onOpen }: { floor: FloorTable[]; onOpen: (id: number)
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-display text-base font-bold text-white">Cafe floor</h2>
         <div className="text-xs text-stone-400">
-          {open.length} open bill{open.length === 1 ? "" : "s"} · <b className="text-amber-400">{formatINR(openTotal)}</b> to collect
+          {open.length} open bill{open.length === 1 ? "" : "s"} · <b className="text-brand-400">{formatINR(openTotal)}</b> to collect
         </div>
       </div>
       <div className="mb-4 flex flex-wrap gap-3 text-[11px] text-stone-400">
@@ -359,7 +359,7 @@ function FloorMap({ floor, onOpen }: { floor: FloorTable[]; onOpen: (id: number)
               <div className="text-[10px] font-bold opacity-75">TABLE</div>
               <div className="font-display text-2xl font-black text-white">{pad(t.number)}</div>
               <div className="truncate text-[11px] font-semibold">{st.label}</div>
-              {t.bill ? <div className="mt-1.5 rounded-lg bg-espresso-950/70 py-1 text-xs font-extrabold text-amber-300">{formatINR(t.bill.totalPaise)} · Bill</div> : <div className="mt-1.5 py-1 text-xs opacity-60">{t.seats} seats</div>}
+              {t.bill ? <div className="mt-1.5 rounded-lg bg-espresso-950/70 py-1 text-xs font-extrabold text-brand-300">{formatINR(t.bill.totalPaise)} · Bill</div> : <div className="mt-1.5 py-1 text-xs opacity-60">{t.seats} seats</div>}
             </button>
           );
         })}
@@ -400,14 +400,15 @@ function BillPanel({ table, cafeName, gstRateBp, onClose, onDone }: { table: Flo
     <>
       <div className="no-print">
       <Sheet
+        dark
         open={!!bill}
         onClose={onClose}
         title={table ? `Table ${pad(table.number)} · Bill #${bill?.billNo}` : ""}
         subtitle={bill ? `Opened ${clockTime(bill.openedAt)} · ${bill.orders.length} order(s)` : ""}
-        icon={<div className="grid size-10 place-items-center rounded-xl bg-amber-500/15 text-amber-400"><ReceiptText className="size-5" /></div>}
+        icon={<div className="grid size-10 place-items-center rounded-xl bg-brand-500/15 text-brand-400"><ReceiptText className="size-5" /></div>}
         footer={bill && (
           <div className="space-y-2">
-            {pending.length > 0 && <p className="rounded-lg bg-amber-500/10 p-2 text-xs text-amber-200">Order {pending.map((o) => `#${o.orderNo}`).join(", ")} is still waiting to be accepted — accept or cancel it before closing the bill.</p>}
+            {pending.length > 0 && <p className="rounded-lg bg-brand-500/10 p-2 text-xs text-brand-200">Order {pending.map((o) => `#${o.orderNo}`).join(", ")} is still waiting to be accepted — accept or cancel it before closing the bill.</p>}
             <div className="grid grid-cols-3 gap-2">
               {([["CASH", Banknote], ["UPI", Smartphone], ["CARD", CreditCard]] as const).map(([m, Icon]) => (
                 <button key={m} disabled={!!busy || pending.length > 0} onClick={() => settle(m)} className="flex flex-col items-center gap-1 rounded-xl bg-emerald-500 py-2.5 text-xs font-extrabold text-espresso-950 hover:bg-emerald-400 disabled:opacity-40">
@@ -429,7 +430,7 @@ function BillPanel({ table, cafeName, gstRateBp, onClose, onDone }: { table: Flo
             <div className="mt-3 space-y-1 border-t border-stone-800 pt-3 text-xs text-stone-400">
               <div className="flex justify-between"><span>Item total</span><span>{formatINR(bill.subtotalPaise)}</span></div>
               {gstRateBp > 0 && <div className="flex justify-between"><span>GST (CGST {formatINR(half)} + SGST {formatINR(bill.taxPaise - half)})</span><span>{formatINR(bill.taxPaise)}</span></div>}
-              <div className="flex justify-between pt-1 text-lg font-extrabold text-amber-400"><span>Total</span><span>{formatINR(bill.totalPaise)}</span></div>
+              <div className="flex justify-between pt-1 text-lg font-extrabold text-brand-400"><span>Total</span><span>{formatINR(bill.totalPaise)}</span></div>
             </div>
           </div>
         )}

@@ -38,7 +38,7 @@ export default function TablesAdmin() {
       <PageHeader
         title="Tables & QR codes"
         subtitle="Each table has its own secret QR link. Print them, laminate, and stick them on the tables."
-        actions={<Link href="/admin/tables/print" target="_blank" className="inline-flex items-center gap-1.5 rounded-xl bg-espresso-900 px-3.5 py-2 text-sm font-bold text-amber-300"><Printer className="size-4" /> Print all QR cards</Link>}
+        actions={<Link href="/admin/tables/print" target="_blank" className="inline-flex items-center gap-1.5 rounded-xl bg-espresso-900 px-3.5 py-2 text-sm font-bold text-brand-300"><Printer className="size-4" /> Print all QR cards</Link>}
       />
 
       <Card title="Website address in the QR codes" className="mb-4">
@@ -51,13 +51,13 @@ export default function TablesAdmin() {
           <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-stone-600">
             <span>This computer on Wi-Fi:</span>
             {lanUrls.map((u) => (
-              <button key={u} onClick={() => { setBase(u); toast("QR address saved", { body: "Phones on the cafe Wi-Fi can open it" }); }} className={cn("rounded-lg border px-2 py-1 font-mono", u === base ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-cream-300 bg-white hover:border-amber-500")}>{u}</button>
+              <button key={u} onClick={() => { setBase(u); toast("QR address saved", { body: "Phones on the cafe Wi-Fi can open it" }); }} className={cn("rounded-lg border px-2 py-1 font-mono", u === base ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-cream-300 bg-white hover:border-brand-500")}>{u}</button>
             ))}
             {saved && <button onClick={() => { setBase(""); toast("Back to automatic address"); }} className="text-stone-500 underline">reset to automatic</button>}
           </div>
         )}
         {isLocalUrl(base) && (
-          <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
+          <p className="mt-2 flex items-start gap-1.5 text-xs text-brand-700">
             <TriangleAlert className="mt-px size-3.5 shrink-0" /> &quot;localhost&quot; only works on this computer — customers&apos; phones can&apos;t open it. Use your live website (e.g. https://order.yourcafe.in) or this computer&apos;s Wi-Fi address above before printing.
           </p>
         )}
@@ -98,7 +98,7 @@ function TableCard({ t, base, run }: { t: Table; base: string; run: (fn: () => P
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {qr && <img src={qr} alt={`QR code for table ${t.number}`} className="mx-auto my-3 size-36 rounded-lg bg-white p-1" />}
-      <a href={`/t/${t.code}`} target="_blank" className="flex items-center justify-center gap-1 truncate text-xs font-semibold text-amber-700 hover:underline"><ExternalLink className="size-3" /> Open as customer</a>
+      <a href={`/t/${t.code}`} target="_blank" className="flex items-center justify-center gap-1 truncate text-xs font-semibold text-brand-700 hover:underline"><ExternalLink className="size-3" /> Open as customer</a>
       <div className="mt-3 grid grid-cols-[1fr_4.5rem] gap-2">
         <Field label="Label"><input value={label} onChange={(e) => setLabel(e.target.value)} onBlur={() => label !== (t.label ?? "") && run(() => api(`/api/admin/tables/${t.id}`, "PATCH", { label }), "Saved")} placeholder="e.g. Window" className={cn(inputCls, "py-1.5")} /></Field>
         <Field label="Seats"><input type="number" min={1} max={30} value={seats} onChange={(e) => setSeats(e.target.value)} onBlur={() => Number(seats) !== t.seats && run(() => api(`/api/admin/tables/${t.id}`, "PATCH", { seats: Number(seats) }), "Saved")} className={cn(inputCls, "py-1.5")} /></Field>

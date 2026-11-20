@@ -18,9 +18,9 @@ type Bill = {
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  PLACED: "bg-amber-100 text-amber-800", PREPARING: "bg-sky-100 text-sky-800", READY: "bg-emerald-100 text-emerald-800",
+  PLACED: "bg-brand-100 text-brand-800", PREPARING: "bg-sky-100 text-sky-800", READY: "bg-emerald-100 text-emerald-800",
   SERVED: "bg-stone-100 text-stone-700", CANCELLED: "bg-rose-100 text-rose-700",
-  OPEN: "bg-amber-100 text-amber-800", PAID: "bg-emerald-100 text-emerald-800", VOID: "bg-stone-100 text-stone-500",
+  OPEN: "bg-brand-100 text-brand-800", PAID: "bg-emerald-100 text-emerald-800", VOID: "bg-stone-100 text-stone-500",
 };
 
 const dt = (s: string) => new Date(s).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
@@ -47,12 +47,12 @@ export default function OrdersPage() {
       <PageHeader
         title="Orders & bills"
         subtitle="Every order placed from the table QR codes, and every bill your staff closed."
-        actions={<a href={incomplete ? undefined : `/api/admin/orders/export?${exportQs}`} className="inline-flex items-center gap-1.5 rounded-xl bg-espresso-900 px-3.5 py-2 text-sm font-bold text-amber-300"><Download className="size-4" /> Export CSV</a>}
+        actions={<a href={incomplete ? undefined : `/api/admin/orders/export?${exportQs}`} className="inline-flex items-center gap-1.5 rounded-xl bg-espresso-900 px-3.5 py-2 text-sm font-bold text-brand-300"><Download className="size-4" /> Export CSV</a>}
       />
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="flex rounded-xl border border-cream-300 bg-white p-1">
           {(["orders", "bills"] as const).map((t) => (
-            <button key={t} onClick={() => { setTab(t); reset(); }} className={cn("rounded-lg px-4 py-1.5 text-sm font-bold capitalize", tab === t ? "bg-amber-500 text-espresso-950" : "text-stone-600")}>{t}</button>
+            <button key={t} onClick={() => { setTab(t); reset(); }} className={cn("rounded-lg px-4 py-1.5 text-sm font-bold capitalize", tab === t ? "bg-brand-600 text-white" : "text-stone-600")}>{t}</button>
           ))}
         </div>
         <RangePicker {...r} onChange={(v) => { setR(v); reset(); }} />

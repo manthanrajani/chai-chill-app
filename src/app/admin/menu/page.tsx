@@ -74,7 +74,7 @@ export default function MenuAdmin() {
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className={cn("size-2.5 rounded-full", i.isVeg ? "bg-emerald-500" : "bg-rose-600")} title={i.isVeg ? "Veg" : "Non-veg"} />
                     <span className="truncate font-bold">{i.name}</span>
-                    {i.tags.map((t) => <span key={t} className="rounded-full bg-amber-100 px-1.5 text-[10px] font-bold text-amber-800">{t}</span>)}
+                    {i.tags.map((t) => <span key={t} className="rounded-full bg-brand-100 px-1.5 text-[10px] font-bold text-brand-800">{t}</span>)}
                   </div>
                   <div className="truncate text-xs text-stone-500">{i.category.name} · {i.description}</div>
                 </div>
@@ -154,7 +154,7 @@ function ItemForm({ item, categories, onClose, onSave, onDelete }: { item: Parti
   }
 
   return (
-    <Sheet open onClose={onClose} light title={item.id ? "Edit dish" : "Add dish"} className="sm:max-w-lg">
+    <Sheet open onClose={onClose} title={item.id ? "Edit dish" : "Add dish"} className="sm:max-w-lg">
       <form onSubmit={submit} className="grid gap-3 text-stone-900">
         <div className="grid grid-cols-[1fr_5rem] gap-3">
           <Field label="Dish name"><input required maxLength={80} value={f.name} onChange={(e) => set("name", e.target.value)} className={inputCls} /></Field>
@@ -191,7 +191,7 @@ function CategoryForm({ cat, onClose, onSave, onDelete }: { cat: Partial<Categor
   const [sortOrder, setSortOrder] = useState(String(cat.sortOrder ?? 0));
   const [active, setActive] = useState(cat.active ?? true);
   return (
-    <Sheet open onClose={onClose} light title={cat.id ? "Edit category" : "New category"}>
+    <Sheet open onClose={onClose} title={cat.id ? "Edit category" : "New category"}>
       <form className="grid gap-3" onSubmit={(e) => { e.preventDefault(); onSave({ name: name.trim(), emoji: emoji.trim() || "🍽️", sortOrder: Number(sortOrder) || 0, active }); }}>
         <div className="grid grid-cols-[1fr_5rem] gap-3">
           <Field label="Name"><input required maxLength={40} value={name} onChange={(e) => setName(e.target.value)} className={inputCls} /></Field>

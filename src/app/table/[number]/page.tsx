@@ -14,10 +14,10 @@ export default function TablePage({ params }: PageProps<"/t/[code]">) {
 function TableSkeleton() {
   return (
     <div className="mx-auto w-full max-w-xl space-y-3 px-3 pt-3">
-      <div className="h-36 animate-pulse rounded-3xl bg-espresso-900" />
-      <div className="h-12 animate-pulse rounded-2xl bg-espresso-900" />
+      <div className="h-36 animate-pulse rounded-3xl bg-white" />
+      <div className="h-12 animate-pulse rounded-2xl bg-white" />
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="h-28 animate-pulse rounded-2xl bg-espresso-900" />
+        <div key={i} className="h-28 animate-pulse rounded-2xl bg-white" />
       ))}
     </div>
   );

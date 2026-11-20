@@ -35,16 +35,16 @@ export default function PrintQr() {
   const list = tables.data?.tables.filter((t) => t.active) ?? [];
   return (
     <div className="mx-auto max-w-5xl p-6">
-      <div className="no-print mb-6 flex items-center justify-between rounded-2xl bg-amber-50 p-4">
+      <div className="no-print mb-6 flex items-center justify-between rounded-2xl bg-brand-50 p-4">
         <p className="text-sm text-stone-700">QR codes point to <b>{base}</b>. Cut along the dashed lines.</p>
-        <button onClick={() => window.print()} className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 font-bold"><Printer className="size-4" /> Print</button>
+        <button onClick={() => window.print()} className="flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 font-bold"><Printer className="size-4" /> Print</button>
       </div>
       <div className="grid grid-cols-2 gap-4 print:gap-0">
         {list.map((t) => (
           <div key={t.id} className="break-inside-avoid rounded-xl border-2 border-dashed border-stone-300 p-5 text-center">
             <div className="text-2xl">☕</div>
             <div className="font-display text-xl font-extrabold">{s?.cafeName}</div>
-            <div className="mt-1 inline-block rounded-full bg-stone-900 px-4 py-1 text-lg font-black text-amber-400">TABLE {String(t.number).padStart(2, "0")}</div>
+            <div className="mt-1 inline-block rounded-full bg-stone-900 px-4 py-1 text-lg font-black text-brand-400">TABLE {String(t.number).padStart(2, "0")}</div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {codes[t.id] && <img src={codes[t.id]} alt="" className="mx-auto mt-3 size-48" />}
             <div className="mt-2 text-sm font-bold">Scan to see menu, order &amp; play games</div>

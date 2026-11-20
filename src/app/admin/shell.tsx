@@ -34,19 +34,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         const Icon = n.icon;
         return (
           <Link key={n.href} href={n.href} onClick={() => setOpen(false)}
-            className={cn("flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition", active ? "bg-espresso-900 text-amber-300" : "text-stone-600 hover:bg-cream-200 hover:text-stone-900")}>
+            className={cn("flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition", active ? "bg-espresso-900 text-brand-300" : "text-stone-600 hover:bg-cream-200 hover:text-stone-900")}>
             <Icon className="size-4" /> {n.label}
           </Link>
         );
       })}
-      <Link href="/kitchen" className="mt-3 flex items-center gap-2.5 rounded-xl border border-cream-300 px-3 py-2.5 text-sm font-semibold text-stone-700 hover:border-amber-500">
-        <ChefHat className="size-4 text-amber-600" /> Open kitchen screen
+      <Link href="/kitchen" className="mt-3 flex items-center gap-2.5 rounded-xl border border-cream-300 px-3 py-2.5 text-sm font-semibold text-stone-700 hover:border-brand-500">
+        <ChefHat className="size-4 text-brand-600" /> Open kitchen screen
       </Link>
     </nav>
   );
 
   return (
-    <div className="flex min-h-dvh flex-1 bg-cream-100 text-stone-900 selection:bg-amber-300">
+    <div className="flex min-h-dvh flex-1 bg-cream-100 text-stone-900 selection:bg-brand-200">
       <aside className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-cream-300 bg-cream-50 p-4 lg:flex">
         <Brand name={settings.data?.settings.cafeName} />
         <div className="mt-6 flex-1">{nav}</div>
@@ -78,9 +78,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 function Brand({ name }: { name?: string }) {
   return (
     <Link href="/admin" className="flex items-center gap-2.5">
-      <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-lg">☕</div>
+      <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-tr from-brand-500 to-brand-600 text-lg">☕</div>
       <div>
-        <div className="font-display text-sm font-extrabold leading-tight">{name ?? "Chai & Chill Cafe"}</div>
+        <div className="font-display text-sm font-extrabold leading-tight">{name ?? "Your cafe"}</div>
         <div className="text-[11px] text-stone-500">Owner dashboard</div>
       </div>
     </Link>

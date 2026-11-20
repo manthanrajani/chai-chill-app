@@ -28,7 +28,7 @@ type Report = {
   avgPrepMinutes: number | null;
 };
 
-const CHART = "#c2620a"; // validated single-series brand hue (≥3:1 on white)
+const CHART = "#c44f1c"; // validated single-series brand hue (≥3:1 on white)
 const num = new Intl.NumberFormat("en-IN");
 
 function greeting() {
@@ -57,7 +57,7 @@ export function Dashboard() {
         <LiveChip icon={<ChefHat className="size-4" />} label="Orders in kitchen" value={o ? num.format(o.live.activeOrders) : "–"} />
         <LiveChip icon={<ReceiptText className="size-4" />} label="Open bills to collect" value={o ? formatINR(o.live.openBillsPaise) : "–"} sub={o ? plural(o.live.openBills, "table") : undefined} />
         <LiveChip icon={<BellRing className="size-4" />} label="Waiting table requests" value={o ? num.format(o.live.openRequests) : "–"} alert={!!o?.live.openRequests} />
-        <Link href="/kitchen" className="flex items-center justify-center gap-2 rounded-2xl bg-espresso-900 p-3 text-sm font-bold text-amber-300 hover:bg-espresso-800">
+        <Link href="/kitchen" className="flex items-center justify-center gap-2 rounded-2xl bg-espresso-900 p-3 text-sm font-bold text-brand-300 hover:bg-espresso-800">
           <ChefHat className="size-4" /> Open live kitchen screen
         </Link>
       </div>
@@ -81,7 +81,7 @@ export function Dashboard() {
           <RangePicker {...r} onChange={setR} />
           <a
             href={customIncomplete ? undefined : `/api/admin/orders/export?${qs}`}
-            className={cn("inline-flex items-center gap-1.5 rounded-xl border border-cream-300 bg-white px-3 py-2 text-xs font-bold text-stone-700 hover:border-amber-500", customIncomplete && "pointer-events-none opacity-50")}
+            className={cn("inline-flex items-center gap-1.5 rounded-xl border border-cream-300 bg-white px-3 py-2 text-xs font-bold text-stone-700 hover:border-brand-500", customIncomplete && "pointer-events-none opacity-50")}
           >
             <Download className="size-3.5" /> Export CSV
           </a>
@@ -206,7 +206,7 @@ function ReportView({ data }: { data: Report }) {
         title="Sales trend"
         subtitle={kind === "hour" ? "Sales per hour" : kind === "day" ? "Sales per day" : "Sales per month"}
         actions={
-          <button onClick={() => setAsTable((v) => !v)} className="inline-flex items-center gap-1 rounded-lg border border-cream-300 px-2.5 py-1 text-xs font-semibold text-stone-600 hover:border-amber-500">
+          <button onClick={() => setAsTable((v) => !v)} className="inline-flex items-center gap-1 rounded-lg border border-cream-300 px-2.5 py-1 text-xs font-semibold text-stone-600 hover:border-brand-500">
             <Table2 className="size-3.5" /> {asTable ? "Show chart" : "Show table"}
           </button>
         }
@@ -271,7 +271,7 @@ function ReportView({ data }: { data: Report }) {
         </Card>
         <Card title="Kitchen speed">
           <div className="flex items-center gap-4">
-            <div className="grid size-16 place-items-center rounded-2xl bg-amber-50 text-amber-700"><Timer className="size-7" /></div>
+            <div className="grid size-16 place-items-center rounded-2xl bg-brand-50 text-brand-700"><Timer className="size-7" /></div>
             <div>
               <div className="font-display text-3xl font-extrabold tabular-nums">{data.avgPrepMinutes == null ? "—" : `${data.avgPrepMinutes.toFixed(1)} min`}</div>
               <div className="text-sm text-stone-500">Average time from order to “ready”</div>
@@ -290,7 +290,7 @@ function fmtDay(ymd: string) {
 function Kpi({ label, value, sub, strong }: { label: string; value: string; sub?: string; strong?: boolean }) {
   return (
     <div className={cn("rounded-2xl border p-4", strong ? "border-espresso-900 bg-espresso-900 text-white" : "border-cream-300 bg-white")}>
-      <div className={cn("text-xs font-semibold", strong ? "text-amber-300" : "text-stone-500")}>{label}</div>
+      <div className={cn("text-xs font-semibold", strong ? "text-brand-300" : "text-stone-500")}>{label}</div>
       <div className="mt-1 font-display text-2xl font-extrabold tabular-nums">{value}</div>
       {sub && <div className={cn("text-xs", strong ? "text-stone-300" : "text-stone-500")}>{sub}</div>}
     </div>

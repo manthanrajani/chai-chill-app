@@ -30,8 +30,8 @@ export function TttBoard({ board, onMove, disabled, highlight }: { board: Cell[]
           aria-label={`Square ${i + 1}${cell ? `, ${cell}` : ""}`}
           className={cn(
             "grid aspect-square place-items-center rounded-2xl border font-display text-4xl font-black transition active:scale-95",
-            highlight?.includes(i) ? "border-emerald-400 bg-emerald-500/15" : "border-stone-800 bg-espresso-950 enabled:hover:border-amber-500/50",
-            cell === "X" ? "text-amber-400" : "text-indigo-400",
+            highlight?.includes(i) ? "border-emerald-400 bg-emerald-500/15" : "border-line bg-sand enabled:hover:border-brand-500/50",
+            cell === "X" ? "text-brand-600" : "text-indigo-700",
           )}
         >
           {cell}
@@ -150,15 +150,15 @@ export function LocalQuiz() {
       {done ? (
         <div className="py-6 text-center">
           <div className="text-4xl">{scores[0] === scores[1] ? "🤝" : "🏆"}</div>
-          <div className="mt-2 font-display text-lg font-extrabold text-white">
+          <div className="mt-2 font-display text-lg font-extrabold text-ink">
             {scores[0] === scores[1] ? "It's a tie!" : `Team ${scores[0] > scores[1] ? "A" : "B"} wins!`}
           </div>
           <PlayAgain onClick={reset} />
         </div>
       ) : (
-        <div className="rounded-xl border border-stone-800 bg-espresso-950 p-4">
-          <p className={cn("mb-1 text-[11px] font-bold uppercase", team === 0 ? "text-amber-400" : "text-indigo-400")}>Team {team === 0 ? "A" : "B"}&apos;s question</p>
-          <h4 className="mb-4 text-sm font-bold text-white sm:text-base">{q.q}</h4>
+        <div className="rounded-xl border border-line bg-sand p-4">
+          <p className={cn("mb-1 text-[11px] font-bold uppercase", team === 0 ? "text-brand-600" : "text-indigo-700")}>Team {team === 0 ? "A" : "B"}&apos;s question</p>
+          <h4 className="mb-4 text-sm font-bold text-ink sm:text-base">{q.q}</h4>
           <div className="space-y-2">
             {q.opts.map((opt, i) => (
               <button
@@ -167,10 +167,10 @@ export function LocalQuiz() {
                 disabled={picked !== null}
                 className={cn(
                   "w-full rounded-xl border p-3 text-left text-sm font-semibold transition",
-                  picked === null && "border-stone-800 bg-espresso-900 text-stone-200 hover:border-amber-500/50 hover:bg-amber-500/10",
-                  picked !== null && i === q.ans && "border-emerald-500 bg-emerald-500/20 text-emerald-200",
-                  picked !== null && i === picked && i !== q.ans && "border-rose-500 bg-rose-500/20 text-rose-200",
-                  picked !== null && i !== picked && i !== q.ans && "border-stone-800 bg-espresso-900 text-stone-500",
+                  picked === null && "border-line bg-white text-ink hover:border-brand-500/50 hover:bg-brand-600/10",
+                  picked !== null && i === q.ans && "border-emerald-500 bg-emerald-500/20 text-emerald-700",
+                  picked !== null && i === picked && i !== q.ans && "border-rose-500 bg-rose-500/20 text-rose-600",
+                  picked !== null && i !== picked && i !== q.ans && "border-line bg-white text-ink-3",
                 )}
               >
                 {String.fromCharCode(65 + i)}. {opt}
@@ -178,7 +178,7 @@ export function LocalQuiz() {
             ))}
           </div>
           {picked !== null && (
-            <p className={cn("mt-3 text-sm font-bold", picked === q.ans ? "text-emerald-400" : "text-rose-400")}>
+            <p className={cn("mt-3 text-sm font-bold", picked === q.ans ? "text-emerald-700" : "text-rose-600")}>
               {picked === q.ans ? "✅ Sahi jawab! +10" : `❌ Galat! Sahi jawab: ${q.opts[q.ans]}`}
             </p>
           )}
@@ -220,7 +220,7 @@ export function LocalRps() {
   return (
     <GameCard title="Stone • Paper • Scissors" subtitle="Beat the Cafe Bot 🤖" onReset={() => { setScore({ you: 0, bot: 0 }); setYou(null); setBot(null); setMsg("Choose your move!"); }}>
       <RpsArena leftLabel="You" rightLabel="Cafe Bot 🤖" left={you ? RPS_ICON[you] : "🤜"} right={bot ? RPS_ICON[bot] : "🤛"} leftScore={score.you} rightScore={score.bot} />
-      <p className="mb-3 text-center text-sm font-bold text-amber-300">{msg}</p>
+      <p className="mb-3 text-center text-sm font-bold text-brand-600">{msg}</p>
       <RpsButtons onPick={play} />
     </GameCard>
   );
@@ -228,17 +228,17 @@ export function LocalRps() {
 
 export function RpsArena(p: { leftLabel: string; rightLabel: string; left: string; right: string; leftScore: number; rightScore: number }) {
   return (
-    <div className="mb-4 flex items-center justify-around rounded-2xl border border-stone-800 bg-espresso-950 p-4 text-center">
+    <div className="mb-4 flex items-center justify-around rounded-2xl border border-line bg-sand p-4 text-center">
       <div>
-        <p className="mb-1 text-[11px] text-stone-400">{p.leftLabel}</p>
+        <p className="mb-1 text-[11px] text-ink-2">{p.leftLabel}</p>
         <div className="text-5xl">{p.left}</div>
-        <p className="mt-1 text-xs font-bold text-amber-400">Wins: {p.leftScore}</p>
+        <p className="mt-1 text-xs font-bold text-brand-600">Wins: {p.leftScore}</p>
       </div>
-      <div className="text-sm font-extrabold text-stone-500">VS</div>
+      <div className="text-sm font-extrabold text-ink-3">VS</div>
       <div>
-        <p className="mb-1 text-[11px] text-stone-400">{p.rightLabel}</p>
+        <p className="mb-1 text-[11px] text-ink-2">{p.rightLabel}</p>
         <div className="text-5xl">{p.right}</div>
-        <p className="mt-1 text-xs font-bold text-indigo-400">Wins: {p.rightScore}</p>
+        <p className="mt-1 text-xs font-bold text-indigo-700">Wins: {p.rightScore}</p>
       </div>
     </div>
   );
@@ -252,7 +252,7 @@ export function RpsButtons({ onPick, disabled }: { onPick: (r: Rps) => void; dis
           key={r}
           disabled={disabled}
           onClick={() => onPick(r)}
-          className="rounded-xl bg-espresso-800 py-3 text-sm font-bold transition hover:bg-amber-500 hover:text-espresso-950 active:scale-95 disabled:opacity-40 disabled:hover:bg-espresso-800 disabled:hover:text-stone-100"
+          className="rounded-xl bg-sand-2 py-3 text-sm font-bold transition hover:bg-brand-600 hover:text-white active:scale-95 disabled:opacity-40 disabled:hover:bg-sand-2 disabled:hover:text-ink"
         >
           {RPS_ICON[r]} {RPS_LABEL[r]}
         </button>
@@ -266,15 +266,15 @@ export function RpsButtons({ onPick, disabled }: { onPick: (r: Rps) => void; dis
 // ---------------------------------------------------------------------------
 export function GameCard({ title, subtitle, onReset, children, extra }: { title: string; subtitle: string; onReset?: () => void; children: React.ReactNode; extra?: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-stone-800 bg-espresso-900 p-4 animate-pop">
+    <div className="rounded-2xl border border-line bg-white p-4 animate-pop">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
-          <h3 className="font-display text-base font-bold text-white">{title}</h3>
-          <p className="text-xs text-stone-400">{subtitle}</p>
+          <h3 className="font-display text-base font-bold text-ink">{title}</h3>
+          <p className="text-xs text-ink-2">{subtitle}</p>
         </div>
         {extra}
         {onReset && (
-          <button onClick={onReset} className="flex shrink-0 items-center gap-1 rounded-lg bg-espresso-800 px-3 py-1.5 text-xs font-semibold text-amber-400 hover:bg-espresso-700">
+          <button onClick={onReset} className="flex shrink-0 items-center gap-1 rounded-lg bg-sand-2 px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-line">
             <RotateCcw className="size-3" /> Reset
           </button>
         )}
@@ -287,20 +287,20 @@ export function GameCard({ title, subtitle, onReset, children, extra }: { title:
 export function Score({ left, mid, right }: { left: string; mid: string; right: string }) {
   return (
     <div className="mb-2 flex items-center justify-between text-xs font-extrabold">
-      <span className="text-amber-400">{left}</span>
-      <span className="text-stone-500">{mid}</span>
-      <span className="text-indigo-400">{right}</span>
+      <span className="text-brand-600">{left}</span>
+      <span className="text-ink-3">{mid}</span>
+      <span className="text-indigo-700">{right}</span>
     </div>
   );
 }
 
 export function Status({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-xl border border-stone-800 bg-espresso-950 px-3 py-2 text-center text-sm font-bold text-amber-400">{children}</div>;
+  return <div className="rounded-xl border border-line bg-sand px-3 py-2 text-center text-sm font-bold text-brand-600">{children}</div>;
 }
 
 export function PlayAgain({ onClick, label = "Play again" }: { onClick: () => void; label?: string }) {
   return (
-    <button onClick={onClick} className="mx-auto mt-2 block rounded-xl bg-amber-500 px-5 py-2 text-sm font-extrabold text-espresso-950 hover:bg-amber-400">
+    <button onClick={onClick} className="mx-auto mt-2 block rounded-xl bg-brand-600 px-5 py-2 text-sm font-extrabold text-white hover:bg-brand-700">
       {label}
     </button>
   );
